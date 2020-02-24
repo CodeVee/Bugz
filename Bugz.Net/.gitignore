@@ -1,1 +1,7 @@
+/.vs
 /Bugz.Server.API/obj
+/Bugz.Server.API/bin
+/Contracts/obj
+/Contracts/bin
+/LoggerService/obj
+/LoggerService/bin
