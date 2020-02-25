@@ -21,5 +21,6 @@ namespace Entities.Models
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public ICollection<Comment> Comments { get; set; }
+        public ICollection<History> Activities { get; set; }
     }
 }

@@ -11,6 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog;
 using Bugz.Server.API.Extensions;
+using Microsoft.EntityFrameworkCore;
+using Entities;
+using Entities.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Bugz.Server.API
 {
@@ -29,6 +33,27 @@ namespace Bugz.Server.API
         {
             services.ConfigureCors();
             services.ConfigureLoggerService();
+            services.ConfigureSqlServerContext(Configuration);
+            // services.AddDbContext<RepositoryContext>(opts =>
+            //     opts.UseSqlServer(Configuration.GetConnectionString("sqlConnection")));
+
+            services.AddIdentity<User, IdentityRole<Guid>>(opt =>
+            {
+                opt.Password.RequiredLength = 7;
+                opt.Password.RequireDigit = false;
+                opt.Password.RequireUppercase = false;
+
+                opt.User.RequireUniqueEmail = true;
+
+                opt.SignIn.RequireConfirmedEmail = true;
+
+                opt.Tokens.EmailConfirmationTokenProvider = "emailconfirmation";
+
+                opt.Lockout.AllowedForNewUsers = true;
+                opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(2);
+                opt.Lockout.MaxFailedAccessAttempts = 3;
+            })
+             .AddEntityFrameworkStores<RepositoryContext>();
 
             services.AddControllers();
         }

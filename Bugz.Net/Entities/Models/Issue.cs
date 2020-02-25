@@ -21,5 +21,6 @@ namespace Entities.Models
         public DateTime Created = DateTime.Now;
         public DateTime? DueDate { get; set; }
         public ICollection<Comment> Comments { get; set; }
+        public ICollection<History> Activities { get; set; }
     }
 }

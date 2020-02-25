@@ -13,5 +13,7 @@ namespace Entities.Models
         public ICollection<Issue> AssignedIssue { get; set; }
         public ICollection<Task> CreatedTask { get; set; }
         public ICollection<Task> AssignedTask { get; set; }
+        public ICollection<Comment> Comments { get; set; }
+        public ICollection<History> Activities { get; set; }
     }
 }
