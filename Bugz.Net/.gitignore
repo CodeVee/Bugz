@@ -1,6 +1,9 @@
 /.vs
+/internal_logs
+/logs
 /Bugz.Server.API/obj
 /Bugz.Server.API/bin
+/Bugz.Server.API/nlog.config
 /Contracts/obj
 /Contracts/bin
 /LoggerService/obj
