@@ -37,8 +37,9 @@ namespace Bugz.Server.API
             services.ConfigureSqlServerContext(Configuration);
             services.ConfigureIdentity();
             services.ConfigureRepositoryWrapper();
+            services.ConfigureAuthentication(Configuration);
             services.AddAutoMapper(typeof(Startup));
-            
+
 
             services.ConfigureControllers();
         }
@@ -52,7 +53,9 @@ namespace Bugz.Server.API
             }
 
             app.UseRouting();
-
+            app.UseAuthentication();
+            app.UseAuthorization();
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

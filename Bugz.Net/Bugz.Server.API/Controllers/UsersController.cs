@@ -6,6 +6,7 @@ using AutoMapper;
 using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,7 @@ namespace Bugz.Server.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly ILoggerManager _logger;
@@ -32,7 +34,7 @@ namespace Bugz.Server.API.Controllers
         {
             var users = await _repository.User.GetAllUsers();
             var usersToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
-            
+
             return Ok(usersToReturn);
         }
 
@@ -41,7 +43,9 @@ namespace Bugz.Server.API.Controllers
         {
            var user = await _repository.User.GetUser(id);
 
-           if (user == null) return NotFound();
+           if (user == null) 
+                return NotFound();
+
            var userToReturn = _mapper.Map<UserForListDto>(user);
         
            return Ok(userToReturn);
