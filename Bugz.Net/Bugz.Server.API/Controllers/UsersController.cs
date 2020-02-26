@@ -32,6 +32,7 @@ namespace Bugz.Server.API.Controllers
         {
             var users = await _repository.User.GetAllUsers();
             var usersToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
+            
             return Ok(usersToReturn);
         }
 
