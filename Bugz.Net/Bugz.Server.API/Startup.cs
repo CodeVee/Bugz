@@ -38,6 +38,7 @@ namespace Bugz.Server.API
             services.ConfigureIdentity();
             services.ConfigureRepositoryWrapper();
             services.AddAutoMapper(typeof(Startup));
+            
 
             services.ConfigureControllers();
         }
