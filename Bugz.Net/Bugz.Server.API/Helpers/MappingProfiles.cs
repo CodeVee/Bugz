@@ -11,6 +11,8 @@ namespace Bugz.Server.API.Helpers
             CreateMap<UserForRegisterDto, User>();
             CreateMap<User, UserForDetailedDto>();
             CreateMap<User, UserForListDto>();
+            CreateMap<ProjectForCreationDto, Project>();
+            CreateMap<Project, ProjectForDetailedDto>();
         }
     }
 }

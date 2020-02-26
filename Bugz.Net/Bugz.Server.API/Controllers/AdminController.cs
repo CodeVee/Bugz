@@ -13,7 +13,7 @@ namespace Bugz.Server.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Policy = "Admin")]
     public class AdminController : ControllerBase
     {
         private readonly UserManager<User> _userManager;

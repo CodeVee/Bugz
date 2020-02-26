@@ -92,5 +92,18 @@ namespace Bugz.Server.API.Extensions
                 };
             });
         }
+
+        public static void ConfigureAuthorization(this IServiceCollection services)
+        {
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Admin", policy => 
+                                        policy.RequireRole("Administrator"));
+                options.AddPolicy("AdminOrPM", policy => 
+                                        policy.RequireRole("Administrator", "Project Manager"));
+                options.AddPolicy("AdminPMOrDev", policy => 
+                                        policy.RequireRole("Administrator", "Project Manager", "Developer"));
+            });
+        }
     }
 }
