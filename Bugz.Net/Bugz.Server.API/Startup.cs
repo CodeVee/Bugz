@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Entities;
 using Entities.Models;
 using Microsoft.AspNetCore.Identity;
+using AutoMapper;
 
 namespace Bugz.Server.API
 {
@@ -35,9 +36,10 @@ namespace Bugz.Server.API
             services.ConfigureLoggerService();
             services.ConfigureSqlServerContext(Configuration);
             services.ConfigureIdentity();
-            services.ConfigureRepositoryWrapper();  
+            services.ConfigureRepositoryWrapper();
+            services.AddAutoMapper(typeof(Startup));
 
-            services.AddControllers();
+            services.ConfigureControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -43,16 +43,8 @@ namespace Bugz.Server.API.Extensions
                 opt.Password.RequiredLength = 7;
                 opt.Password.RequireDigit = false;
                 opt.Password.RequireUppercase = false;
-
+                opt.Password.RequireNonAlphanumeric = false;
                 opt.User.RequireUniqueEmail = true;
-
-                opt.SignIn.RequireConfirmedEmail = true;
-
-                opt.Tokens.EmailConfirmationTokenProvider = "emailconfirmation";
-
-                opt.Lockout.AllowedForNewUsers = true;
-                opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(2);
-                opt.Lockout.MaxFailedAccessAttempts = 3;
             })
              .AddEntityFrameworkStores<RepositoryContext>();
         }
@@ -60,6 +52,14 @@ namespace Bugz.Server.API.Extensions
         public static void ConfigureRepositoryWrapper(this IServiceCollection services)
         {
             services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
+        }
+
+        public static void ConfigureControllers(this IServiceCollection services)
+        {
+            services.AddControllers(setupActions => 
+            {
+                setupActions.ReturnHttpNotAcceptable = true;
+            }).AddXmlDataContractSerializerFormatters();
         }
     }
 }

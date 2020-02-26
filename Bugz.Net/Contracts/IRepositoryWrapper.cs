@@ -4,8 +4,7 @@ namespace Contracts
 {
     public interface IRepositoryWrapper
     {
-        IUserRepository GetUser();
-
+        IUserRepository User { get; }
         IProjectRepository Project { get; }
         ITaskRepository Task { get; }
         IIssueRepository Issue { get; }
