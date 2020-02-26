@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using Contracts;
@@ -38,17 +39,34 @@ namespace Bugz.Server.API.Controllers
             return Ok(usersToReturn);
         }
 
-        [HttpGet("{id}", Name = "GetUser")]
-        public async Task<IActionResult> GetUser(Guid id)
+        [HttpGet("{email}", Name = "GetUser")]
+        public async Task<IActionResult> GetUser(string email)
         {
-           var user = await _repository.User.GetUser(id);
+            var isCurrentUser = User.FindFirstValue(ClaimTypes.Name) == email;
+            var roles = User.FindAll(ClaimTypes.Role);
+            bool isAdmin = false;
+            
+            foreach (var item in roles)
+            {
+                
+                if (item.Value == "Administrator")
+                {
+                    isAdmin = true;
+                    break;
+                } 
+            }
+            
+            if (!isCurrentUser && !isAdmin)
+                return BadRequest("You are not Authorized");
+            
+            var user = await _repository.User.GetUser(email);
 
-           if (user == null) 
+            if (user == null)
                 return NotFound();
 
-           var userToReturn = _mapper.Map<UserForListDto>(user);
-        
-           return Ok(userToReturn);
+            var userToReturn = _mapper.Map<UserForListDto>(user);
+
+            return Ok(userToReturn);
         }
     }
 }

@@ -8,6 +8,7 @@ namespace Contracts
     public interface IUserRepository : IRepositoryBase<User>
     {
         Task<IEnumerable<User>> GetAllUsers();
-        Task<User> GetUser(Guid id);
+        Task<User> GetUser(string email);
+        void UpdateUser(User user);
     }
 }

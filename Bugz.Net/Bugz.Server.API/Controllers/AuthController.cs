@@ -58,7 +58,7 @@ namespace Bugz.Server.API.Controllers
             var userToReturn = _mapper.Map<UserForDetailedDto>(userToCreate);
 
             return CreatedAtRoute("GetUser",
-                    new { controller = "Users", id = userToCreate.Id }, userToReturn);
+                    new { controller = "Users", email = userToCreate.Email }, userToReturn);
         }
 
         [HttpPost("login")]

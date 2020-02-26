@@ -20,11 +20,16 @@ namespace Repository
             return await FindAll().OrderBy(user => user.FirstName).ToListAsync();
         }
 
-        public async Task<User> GetUser(Guid id)
+        public async Task<User> GetUser(string email)
         {
-            var user = await FindByCondition(user => user.Id.Equals(id))
+            var user = await FindByCondition(user => user.Email.Equals(email))
                                 .FirstOrDefaultAsync();
             return user;
+        }
+
+        public void UpdateUser(User user)
+        {
+            Update(user);
         }
     }
 }
