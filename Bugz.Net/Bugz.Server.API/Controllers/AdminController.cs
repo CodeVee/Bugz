@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Contracts;
@@ -6,6 +7,7 @@ using Entities.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bugz.Server.API.Controllers
 {
@@ -16,8 +18,10 @@ namespace Bugz.Server.API.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly ILoggerManager _logger;
-        public AdminController(UserManager<User> userManager, ILoggerManager logger)
+        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+        public AdminController(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, ILoggerManager logger)
         {
+            _roleManager = roleManager;
             _logger = logger;
             _userManager = userManager;
 
@@ -31,11 +35,16 @@ namespace Bugz.Server.API.Controllers
             if (user == null)
                 return NotFound("User Not Found");
 
+            var selectedRoles = roleUpdateDto.Roles ?? new string[] { };
+
+            foreach (var role in selectedRoles)
+            {
+                var roleExist = await _roleManager.RoleExistsAsync(role);
+                if (!roleExist)
+                    return BadRequest($"Role {role} not available");
+            }
+
             var userRoles = await _userManager.GetRolesAsync(user);
-
-            var selectedRoles = roleUpdateDto.Roles;
-
-            selectedRoles = selectedRoles ?? new string[] { };
             var addResult = await _userManager.AddToRolesAsync(user, selectedRoles.Except(userRoles));
 
             if (!addResult.Succeeded)
