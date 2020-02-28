@@ -43,17 +43,16 @@ namespace Bugz.Server.API.Controllers
 
             var projectToReturn = _mapper.Map<ProjectForDetailedDto>(projectFromRepo);
 
-            return Ok(projectFromRepo);
+            return Ok(projectToReturn);
         }
 
         [HttpPost]
         [Authorize(Policy = "Admin")]
         public async Task<IActionResult> CreateProject(ProjectForCreationDto projectForCreation)
         {
-            var startDateCheck = DateTime.Now < projectForCreation.StartDate;
-
+            var startDateCheck = projectForCreation.StartDate < DateTime.Today;
             if (startDateCheck)
-                return BadRequest("StartDate can't before Today");
+                return BadRequest("Start Date can't be before Today");
 
             var endDateCheck = projectForCreation.EndDate < projectForCreation.StartDate;
 
