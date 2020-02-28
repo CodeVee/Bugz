@@ -50,26 +50,27 @@ namespace Bugz.Server.API.Controllers
         [Authorize(Policy = "Admin")]
         public async Task<IActionResult> CreateProject(ProjectForCreationDto projectForCreation)
         {
-            var startDateCheck = projectForCreation.StartDate < DateTime.Today;
-            if (startDateCheck)
-                return BadRequest("Start Date can't be before Today");
-
-            var endDateCheck = projectForCreation.EndDate < projectForCreation.StartDate;
-
-            if (endDateCheck)
-                return BadRequest("Start Date can't be less than End Date");
+            var dateCheck = ValidateProjectDates(projectForCreation);
+            if (dateCheck)
+                return BadRequest("Start Date must be from today and less than End Date");
                 
             var project = _mapper.Map<Project>(projectForCreation);
-
             _repository.Project.Create(project);
 
-            if(await _repository.SaveAsync())
-            {
-                var projectToReturn = _mapper.Map<ProjectForDetailedDto>(project);
-                return CreatedAtRoute("GetProject", new {projectId = projectToReturn.ProjectId }, projectToReturn);
-            }
+            var saveProject = await _repository.SaveAsync();
+            if(!saveProject)
+                throw new Exception($"Failed to Create Project");
 
-            throw new Exception($"Failed to Create Project");
+            var projectToReturn = _mapper.Map<ProjectForDetailedDto>(project);
+            return CreatedAtRoute("GetProject", new {projectId = projectToReturn.ProjectId }, projectToReturn);   
+        }
+
+        private bool ValidateProjectDates(ProjectDto projectDto)
+        {
+            var startDateCheck = projectDto.StartDate < DateTime.Today;
+            var endDateCheck = projectDto.EndDate < projectDto.StartDate;
+
+            return startDateCheck || endDateCheck;      
         }
     }
 }
