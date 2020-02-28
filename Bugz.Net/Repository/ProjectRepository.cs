@@ -39,5 +39,10 @@ namespace Repository
                             .FirstOrDefaultAsync();
             return project.Title.Equals(title);
         }
+
+        public void UpdateProject(Project project)
+        {
+            Update(project);
+        }
     }
 }

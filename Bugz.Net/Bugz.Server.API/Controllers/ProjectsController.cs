@@ -65,6 +65,28 @@ namespace Bugz.Server.API.Controllers
             return CreatedAtRoute("GetProject", new {projectId = projectToReturn.ProjectId }, projectToReturn);   
         }
 
+        [HttpPut("{projectId}")]
+        public async Task<IActionResult> UpdateProject(Guid projectId, ProjectForUpdateDto projectForUpdate)
+        {
+            var dateCheck = ValidateProjectDates(projectForUpdate);
+            if (dateCheck)
+                return BadRequest("Start Date must be from today and less than End Date");
+
+            var projectFromRepo = await _repository.Project.GetProject(projectId);
+
+            if (projectFromRepo == null)
+                return BadRequest("Invalid Request");
+
+            _mapper.Map(projectForUpdate, projectFromRepo);
+            _repository.Project.UpdateProject(projectFromRepo);
+
+            var updateProject = await _repository.SaveAsync();
+            if(!updateProject)
+                throw new Exception($"Failed to Create Project");
+
+            return NoContent();
+        }
+
         private bool ValidateProjectDates(ProjectDto projectDto)
         {
             var startDateCheck = projectDto.StartDate < DateTime.Today;

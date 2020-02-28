@@ -11,5 +11,6 @@ namespace Contracts
         Task<Project> GetProject(Guid projectId);
         Task<bool> ProjectTitleIsUnique(string title);
         void CreateProject(Project project);
+        void UpdateProject(Project project);
     }
 }
