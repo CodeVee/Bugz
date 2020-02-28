@@ -20,6 +20,11 @@ namespace Repository
             Create(project);
         }
 
+        public void DeleteProject(Project project)
+        {
+            Delete(project);
+        }
+
         public async Task<IEnumerable<Project>> GetAllProjects()
         {
             return await FindAll()

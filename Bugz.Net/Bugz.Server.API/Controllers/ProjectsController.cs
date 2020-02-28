@@ -82,7 +82,23 @@ namespace Bugz.Server.API.Controllers
 
             var updateProject = await _repository.SaveAsync();
             if(!updateProject)
-                throw new Exception($"Failed to Create Project");
+                throw new Exception("Failed to Update Project");
+
+            return NoContent();
+        }
+
+        [HttpDelete("{projectId}")]
+        public async Task<IActionResult> DeleteProject(Guid projectId)
+        {
+            var projectFromRepo = await _repository.Project.GetProject(projectId);
+            if (projectFromRepo == null)
+                return BadRequest("Invalid Request");
+
+            _repository.Project.DeleteProject(projectFromRepo);
+
+            var deleteProject = await _repository.SaveAsync();
+            if (!deleteProject)
+                throw new Exception("Failed to Delete Project");
 
             return NoContent();
         }
