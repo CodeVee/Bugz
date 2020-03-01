@@ -15,6 +15,8 @@ namespace Bugz.Server.API.Helpers
             CreateMap<Project, ProjectForDetailedDto>();
             CreateMap<ProjectForUpdateDto, Project>();
             CreateMap<Project, ProjectForUpdateDto>();
+            CreateMap<IssueForCreationDto, Issue>();
+            CreateMap<Issue, IssueForDetailedDto>();
         }
     }
 }

@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Contracts;
 using Entities;
 using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Repository
 {
@@ -15,22 +17,25 @@ namespace Repository
 
         public void CreateIssue(Issue issue)
         {
-            throw new NotImplementedException();
+            Create(issue);
         }
 
-        public Task<IEnumerable<Issue>> GetAllIssues()
+        public async Task<IEnumerable<Issue>> GetAllIssues()
         {
-            throw new NotImplementedException();
+            return await FindAll().OrderBy(issue => issue.Created)
+                        .ToListAsync();
         }
 
-        public Task<Issue> GetIssue(Guid issueId)
+        public async Task<Issue> GetIssue(Guid issueId)
         {
-            throw new NotImplementedException();
+            return await FindByCondition(issue => issue.IssueId.Equals(issueId))
+                        .FirstOrDefaultAsync();
         }
 
-        public Task<IEnumerable<Issue>> GetIssuesForProject(Guid projectId)
+        public async Task<IEnumerable<Issue>> GetIssuesForProject(Guid projectId)
         {
-            throw new NotImplementedException();
+            return await FindByCondition(issue => issue.ProjectId.Equals(projectId))
+                        .ToListAsync();
         }
     }
 }
