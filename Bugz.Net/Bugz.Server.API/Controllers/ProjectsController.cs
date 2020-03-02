@@ -29,7 +29,7 @@ namespace Bugz.Server.API.Controllers
         public async Task<IActionResult> GetProjects()
         {
             var projectsFromRepo = await _repository.Project.GetAllProjects();
-            var projectsToReturn = _mapper.Map<IEnumerable<ProjectForDetailedDto>>(projectsFromRepo);
+            var projectsToReturn = _mapper.Map<IEnumerable<ProjectForListDto>>(projectsFromRepo);
 
             return Ok(projectsToReturn);
         }
@@ -37,7 +37,7 @@ namespace Bugz.Server.API.Controllers
         [HttpGet("{projectId}", Name = "GetProject")]
         public async Task<IActionResult> GetProject(Guid projectId)
         {
-            var projectFromRepo = await _repository.Project.GetProject(projectId);
+            var projectFromRepo = await _repository.Project.GetProjectWithCollections(projectId);
 
             if (projectFromRepo == null)
                 return BadRequest("Project Not Found");

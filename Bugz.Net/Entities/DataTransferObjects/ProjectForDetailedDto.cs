@@ -1,14 +1,11 @@
 using System;
+using System.Collections.Generic;
+using Entities.Models;
 
 namespace Entities.DataTransferObjects
 {
-    public class ProjectForDetailedDto
+    public class ProjectForDetailedDto : ProjectForListDto
     {
-        public Guid ProjectId { get; set; }
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public bool Billable { get; set; }
+        public ICollection<UserForListDto> Users { get; set; }
     }
 }
