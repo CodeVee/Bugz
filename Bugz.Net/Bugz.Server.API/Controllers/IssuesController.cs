@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -59,7 +60,7 @@ namespace Bugz.Server.API.Controllers
         public async Task<IActionResult> CreateIssueForProject(Guid projectId, IssueForCreationDto issueForCreation)
         {
             if (issueForCreation.DueDate != null && issueForCreation.DueDate < DateTime.Today)
-                return BadRequest("Due Date cannot be before today");  
+                return BadRequest("Due Date cannot be before today");
 
             var projectFromRepo = await _repository.Project.GetProject(projectId);
             if (projectFromRepo == null)
@@ -70,7 +71,7 @@ namespace Bugz.Server.API.Controllers
             Stage status;
 
             Enum.TryParse(issueForCreation.Severity, out severity);
-            Enum.TryParse(issueForCreation.Classification, out classify);          
+            Enum.TryParse(issueForCreation.Classification, out classify);
             Enum.TryParse(issueForCreation.Status, out status);
 
             var issueToCreate = _mapper.Map<Issue>(issueForCreation);
@@ -89,17 +90,17 @@ namespace Bugz.Server.API.Controllers
                 throw new Exception("Failed to create issue for project");
 
             var issueToReturn = _mapper.Map<IssueForDetailedDto>(issueToCreate);
-            return CreatedAtRoute("GetIssue", 
-            new { projectId = issueToCreate.ProjectId, issueId = issueToCreate.IssueId}, issueToReturn);
+            return CreatedAtRoute("GetIssue",
+            new { projectId = issueToCreate.ProjectId, issueId = issueToCreate.IssueId }, issueToReturn);
         }
 
         [HttpPut("{issueId}")]
         public async Task<IActionResult> UpdateIssueForProject(Guid projectId, Guid issueId, IssueForUpdateDto issueForUpdate)
         {
             if (issueForUpdate.DueDate != null && issueForUpdate.DueDate < DateTime.Today)
-                return BadRequest("Due Date cannot be before today");  
+                return BadRequest("Due Date cannot be before today");
 
-            var projectFromRepo = await _repository.Project.GetProject(projectId);
+            var projectFromRepo = await _repository.Project.GetProjectWithUsers(projectId);
             if (projectFromRepo == null)
                 return BadRequest("Project doesn't exist");
 
@@ -107,12 +108,25 @@ namespace Bugz.Server.API.Controllers
             if (issueFromRepo == null)
                 return BadRequest("Project doesn't exist");
 
+            if (issueForUpdate.AssigneeEmail != null)
+            {
+                var user = await _repository.User.GetUser(issueForUpdate.AssigneeEmail);
+                if (user == null)
+                    return BadRequest("User doesn't exist");
+
+                var userOnProject = projectFromRepo.Users.FirstOrDefault(up => up.UserId.Equals(user.Id));
+                if (userOnProject == null)
+                    return BadRequest("User not on project");
+
+                issueFromRepo.AssigneeId = user.Id;
+            }
+
             Severity severity;
             Classification classify;
             Stage status;
-            
+
             Enum.TryParse(issueForUpdate.Severity, out severity);
-            Enum.TryParse(issueForUpdate.Classification, out classify);          
+            Enum.TryParse(issueForUpdate.Classification, out classify);
             Enum.TryParse(issueForUpdate.Status, out status);
 
             _mapper.Map(issueForUpdate, issueFromRepo);
