@@ -115,6 +115,10 @@ namespace Bugz.Server.API.Controllers
             if (user == null)
                 return BadRequest("User doesn't exist");
 
+            var userproject = project.Users.FirstOrDefault(up => up.UserId.Equals(user.Id));
+            if (userproject != null)
+                return NoContent();
+
             project.Users.Add(new UserProject { UserId = user.Id });
             _repository.Project.UpdateProject(project);
 
