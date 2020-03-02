@@ -11,5 +11,6 @@ namespace Contracts
         Task<IEnumerable<Issue>> GetIssuesForProject(Guid projectId);
         Task<Issue> GetIssue(Guid issueId);
         void CreateIssue(Issue issue);
+        void UpdateIssue(Issue issue);
     }
 }

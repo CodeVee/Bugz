@@ -65,9 +65,6 @@ namespace Bugz.Server.API.Controllers
             if (projectFromRepo == null)
                 return BadRequest("Project doesn't exist");
 
-            var issueToCreate = _mapper.Map<Issue>(issueForCreation);
-            var reporterId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-
             Severity severity;
             Classification classify;
             Stage status;
@@ -75,6 +72,9 @@ namespace Bugz.Server.API.Controllers
             Enum.TryParse(issueForCreation.Severity, out severity);
             Enum.TryParse(issueForCreation.Classification, out classify);          
             Enum.TryParse(issueForCreation.Status, out status);
+
+            var issueToCreate = _mapper.Map<Issue>(issueForCreation);
+            var reporterId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
             issueToCreate.Severity = severity;
             issueToCreate.Classification = classify;
@@ -91,6 +91,42 @@ namespace Bugz.Server.API.Controllers
             var issueToReturn = _mapper.Map<IssueForDetailedDto>(issueToCreate);
             return CreatedAtRoute("GetIssue", 
             new { projectId = issueToCreate.ProjectId, issueId = issueToCreate.IssueId}, issueToReturn);
+        }
+
+        [HttpPut("{issueId}")]
+        public async Task<IActionResult> UpdateIssueForProject(Guid projectId, Guid issueId, IssueForUpdateDto issueForUpdate)
+        {
+            if (issueForUpdate.DueDate != null && issueForUpdate.DueDate < DateTime.Today)
+                return BadRequest("Due Date cannot be before today");  
+
+            var projectFromRepo = await _repository.Project.GetProject(projectId);
+            if (projectFromRepo == null)
+                return BadRequest("Project doesn't exist");
+
+            var issueFromRepo = await _repository.Issue.GetIssue(issueId);
+            if (issueFromRepo == null)
+                return BadRequest("Project doesn't exist");
+
+            Severity severity;
+            Classification classify;
+            Stage status;
+            
+            Enum.TryParse(issueForUpdate.Severity, out severity);
+            Enum.TryParse(issueForUpdate.Classification, out classify);          
+            Enum.TryParse(issueForUpdate.Status, out status);
+
+            _mapper.Map(issueForUpdate, issueFromRepo);
+
+            issueFromRepo.Severity = severity;
+            issueFromRepo.Classification = classify;
+            issueFromRepo.Status = status;
+
+            _repository.Issue.UpdateIssue(issueFromRepo);
+            var updateIssue = await _repository.SaveAsync();
+            if (!updateIssue)
+                throw new Exception("Failed to update issue for project");
+
+            return NoContent();
         }
     }
 }

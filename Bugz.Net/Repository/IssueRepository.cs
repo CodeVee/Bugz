@@ -46,5 +46,10 @@ namespace Repository
                         .Include(issue => issue.Project)
                         .ToListAsync();
         }
+
+        public void UpdateIssue(Issue issue)
+        {
+            Update(issue);
+        }
     }
 }
