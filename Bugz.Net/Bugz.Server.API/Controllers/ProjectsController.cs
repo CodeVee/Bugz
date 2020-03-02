@@ -54,16 +54,16 @@ namespace Bugz.Server.API.Controllers
             var dateCheck = ValidateProjectDates(projectForCreation);
             if (dateCheck)
                 return BadRequest("Start Date must be from today and less than End Date");
-                
+
             var project = _mapper.Map<Project>(projectForCreation);
             _repository.Project.Create(project);
 
             var saveProject = await _repository.SaveAsync();
-            if(!saveProject)
+            if (!saveProject)
                 throw new Exception($"Failed to Create Project");
 
             var projectToReturn = _mapper.Map<ProjectForDetailedDto>(project);
-            return CreatedAtRoute("GetProject", new {projectId = projectToReturn.ProjectId }, projectToReturn);   
+            return CreatedAtRoute("GetProject", new { projectId = projectToReturn.ProjectId }, projectToReturn);
         }
 
         [HttpPut("{projectId}")]
@@ -82,7 +82,7 @@ namespace Bugz.Server.API.Controllers
             _repository.Project.UpdateProject(projectFromRepo);
 
             var updateProject = await _repository.SaveAsync();
-            if(!updateProject)
+            if (!updateProject)
                 throw new Exception("Failed to Update Project");
 
             return NoContent();
@@ -115,13 +115,35 @@ namespace Bugz.Server.API.Controllers
             if (user == null)
                 return BadRequest("User doesn't exist");
 
-            project.Users.Add(new UserProject { UserId = user.Id});
+            project.Users.Add(new UserProject { UserId = user.Id });
             _repository.Project.UpdateProject(project);
 
             var addUser = await _repository.SaveAsync();
             if (!addUser)
                 return StatusCode(500);
-            
+
+            return NoContent();
+        }
+
+        [HttpPost("{projectId}/remove/{email}")]
+        public async Task<IActionResult> RemoveUserFromProject(Guid projectId, string email)
+        {
+            var project = await _repository.Project.GetProjectWithUsers(projectId);
+            if (project == null)
+                return BadRequest("Project Doesn't Exist");
+
+            var user = await _repository.User.GetUser(email);
+            if (user == null)
+                return BadRequest("User doesn't exist");
+
+            var userproject = project.Users.FirstOrDefault(up => up.UserId.Equals(user.Id));
+            _repository.Project.UpdateProject(project);
+            project.Users.Remove(userproject);
+
+            var removeUser = await _repository.SaveAsync();
+            if (!removeUser)
+                return StatusCode(500);
+
             return NoContent();
         }
 
@@ -130,7 +152,7 @@ namespace Bugz.Server.API.Controllers
             var startDateCheck = projectDto.StartDate < DateTime.Today;
             var endDateCheck = projectDto.EndDate < projectDto.StartDate;
 
-            return startDateCheck || endDateCheck;      
+            return startDateCheck || endDateCheck;
         }
     }
 }
