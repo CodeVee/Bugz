@@ -23,18 +23,27 @@ namespace Repository
         public async Task<IEnumerable<Issue>> GetAllIssues()
         {
             return await FindAll().OrderBy(issue => issue.Created)
+                        .Include(issue => issue.Reporter)
+                        .Include(issue => issue.Assignee)
+                        .Include(issue => issue.Project)
                         .ToListAsync();
         }
 
         public async Task<Issue> GetIssue(Guid issueId)
         {
             return await FindByCondition(issue => issue.IssueId.Equals(issueId))
+                        .Include(issue => issue.Reporter)
+                        .Include(issue => issue.Assignee)
+                        .Include(issue => issue.Project)
                         .FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Issue>> GetIssuesForProject(Guid projectId)
         {
             return await FindByCondition(issue => issue.ProjectId.Equals(projectId))
+                        .Include(issue => issue.Reporter)
+                        .Include(issue => issue.Assignee)
+                        .Include(issue => issue.Project)
                         .ToListAsync();
         }
     }
