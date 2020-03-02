@@ -18,7 +18,7 @@ namespace Entities.Models
         public Stage Status { get; set; }
         public Guid ProjectId { get; set; }
         public Project Project { get; set; }
-        public DateTime Created = DateTime.Now;
+        public DateTime Created { get; set; }
         public DateTime? DueDate { get; set; }
         public ICollection<Comment> Comments { get; set; }
         public ICollection<History> Activities { get; set; }

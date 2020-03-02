@@ -12,7 +12,6 @@ namespace Entities.DataTransferObjects
         [Required(ErrorMessage = "Description is Required")]
         [StringLength(100, MinimumLength = 20, ErrorMessage = "Description must be between 20 and 100 characters")]
         public string Description { get; set; }
-        public Guid? AssigneeId { get; set; }
         [Required(ErrorMessage = "Severity is Required")]
         public string Severity { get; set; }
         [Required(ErrorMessage = "Classification is Required")]
