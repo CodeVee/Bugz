@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Contracts;
@@ -100,6 +101,27 @@ namespace Bugz.Server.API.Controllers
             if (!deleteProject)
                 throw new Exception("Failed to Delete Project");
 
+            return NoContent();
+        }
+
+        [HttpPost("{projectId}/assign/{email}")]
+        public async Task<IActionResult> AssignUserToProject(Guid projectId, string email)
+        {
+            var project = await _repository.Project.GetProjectWithUsers(projectId);
+            if (project == null)
+                return BadRequest("Project Doesn't Exist");
+
+            var user = await _repository.User.GetUser(email);
+            if (user == null)
+                return BadRequest("User doesn't exist");
+
+            project.Users.Add(new UserProject { UserId = user.Id});
+            _repository.Project.UpdateProject(project);
+
+            var addUser = await _repository.SaveAsync();
+            if (!addUser)
+                return StatusCode(500);
+            
             return NoContent();
         }
 
