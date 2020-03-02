@@ -38,6 +38,23 @@ namespace Repository
                             .FirstOrDefaultAsync();
         }
 
+        public async Task<Project> GetProjectWithCollections(Guid projectId)
+        {
+            return await FindByCondition(project => project.ProjectId.Equals(projectId))
+                        .Include(project => project.Users)
+                            .ThenInclude(userproject => userproject.User)
+                        .Include(project => project.Issues)
+                        .Include(project => project.Tasks)
+                        .FirstOrDefaultAsync();
+        }
+
+        public async Task<Project> GetProjectWithUsers(Guid projectId)
+        {
+            return await FindByCondition(project => project.ProjectId.Equals(projectId))
+                        .Include(project => project.Users)
+                        .FirstOrDefaultAsync();
+        }
+
         public async Task<bool> ProjectTitleIsUnique(string title)
         {
             var project = await FindByCondition(project => project.Title.Equals(title))
