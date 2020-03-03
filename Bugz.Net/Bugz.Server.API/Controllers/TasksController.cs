@@ -146,5 +146,25 @@ namespace Bugz.Server.API.Controllers
 
             return NoContent();
         }
+
+        [HttpDelete("{taskId}")]
+        public async Task<IActionResult> DeleteTask(Guid projectId, Guid taskId)
+        {
+            var projectFromRepo = await _repository.Project.GetProject(projectId);
+            if (projectFromRepo == null)
+                return BadRequest("Project doesn't exist");
+
+            var taskFromRepo = await _repository.Task.GetTask(taskId);
+            if (taskFromRepo == null)
+                return BadRequest("Task doesn't exist");
+
+            _repository.Task.DeleteTask(taskFromRepo);
+
+            var deleteTask = await _repository.SaveAsync();
+            if (!deleteTask)
+                throw new Exception("Failed to Delete Task");
+
+            return NoContent();
+        }
     }
 }

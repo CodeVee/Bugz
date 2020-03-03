@@ -144,7 +144,7 @@ namespace Bugz.Server.API.Controllers
         }
 
         [HttpDelete("{issueId}")]
-        public async Task<IActionResult> DeleteProject(Guid projectId, Guid issueId)
+        public async Task<IActionResult> DeleteIssue(Guid projectId, Guid issueId)
         {
             var projectFromRepo = await _repository.Project.GetProject(projectId);
             if (projectFromRepo == null)

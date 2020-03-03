@@ -13,5 +13,6 @@ namespace Contracts
         Task<Task> GetTask(Guid taskId);
         void CreateTask(Task task);
         void UpdateTask(Task task);
+        void DeleteTask(Task task);
     }
 }

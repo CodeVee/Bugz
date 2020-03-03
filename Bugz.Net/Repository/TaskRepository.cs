@@ -20,6 +20,11 @@ namespace Repository
             Create(task);
         }
 
+        public void DeleteTask(Entities.Models.Task task)
+        {
+            Delete(task);
+        }
+
         public async Task<IEnumerable<Entities.Models.Task>> GetAllTasks()
         {
             return await FindAll().OrderBy(task => task.StartDate)
