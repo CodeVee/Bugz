@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -92,6 +93,58 @@ namespace Bugz.Server.API.Controllers
             var taskToReturn = _mapper.Map<TaskForDetailedDto>(taskToCreate);
             return CreatedAtRoute("GetTask",
             new { projectId = taskToCreate.ProjectId, taskId = taskToCreate.TaskId }, taskToReturn);
+        }
+
+        [HttpPut("{taskId}")]
+        public async Task<IActionResult> UpdateTaskForProject(Guid projectId, Guid taskId, TaskForUpdateDto taskForUpdate)
+        {
+            if (taskForUpdate.StartDate < DateTime.Today)
+                return BadRequest("Start Date cannot be before today");
+
+            if (taskForUpdate.EndDate < taskForUpdate.StartDate)
+                return BadRequest("End Date cannot be before Start Date");
+
+            var projectFromRepo = await _repository.Project.GetProjectWithUsers(projectId);
+            if (projectFromRepo == null)
+                return BadRequest("Project doesn't exist");
+
+            var taskFromRepo = await _repository.Task.GetTask(taskId);
+            if (taskFromRepo == null)
+                return BadRequest("Task does not exist");
+
+            if (taskForUpdate.AssigneeEmail != null)
+            {
+                var user = await _repository.User.GetUser(taskForUpdate.AssigneeEmail);
+                if (user == null)
+                    return BadRequest("User doesn't exist");
+
+                var userOnProject = projectFromRepo.Users.FirstOrDefault(up => up.UserId.Equals(user.Id));
+                if (userOnProject == null)
+                    return BadRequest("User not on project");
+
+                taskFromRepo.AssigneeId = user.Id;
+            }
+
+            Status status;
+            Priority priority;
+            Completion percentage;
+
+            Enum.TryParse(taskForUpdate.Status, out status);
+            Enum.TryParse(taskForUpdate.Percentage, out percentage);
+            Enum.TryParse(taskForUpdate.Priority, out priority);
+
+            _mapper.Map(taskForUpdate, taskFromRepo);
+
+            taskFromRepo.Status = status;
+            taskFromRepo.Percentage = percentage;
+            taskFromRepo.Priority = priority;
+
+            _repository.Task.UpdateTask(taskFromRepo);
+            var updateTask = await _repository.SaveAsync();
+            if (!updateTask)
+                throw new Exception("Failed to update task");
+
+            return NoContent();
         }
     }
 }

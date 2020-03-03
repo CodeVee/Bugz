@@ -46,5 +46,10 @@ namespace Repository
                         .Include(task => task.Project)
                         .ToListAsync();
         }
+
+        public void UpdateTask(Entities.Models.Task task)
+        {
+            Update(task);
+        }
     }
 }

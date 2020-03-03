@@ -12,5 +12,6 @@ namespace Contracts
         Task<IEnumerable<Task>> GetTasksForProject(Guid projectId);
         Task<Task> GetTask(Guid taskId);
         void CreateTask(Task task);
+        void UpdateTask(Task task);
     }
 }

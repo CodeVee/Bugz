@@ -64,6 +64,8 @@ namespace Bugz.Server.API.Helpers
                 {
                     opt.MapFrom(src => src.Assignee.FirstName);
                 });
+            CreateMap<TaskForUpdateDto, Task>();
+            CreateMap<Task, TaskForUpdateDto>();
         }
     }
 }
