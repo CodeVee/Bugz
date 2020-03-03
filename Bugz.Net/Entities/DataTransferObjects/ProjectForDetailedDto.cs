@@ -8,5 +8,6 @@ namespace Entities.DataTransferObjects
     {
         public ICollection<UserForListDto> Users { get; set; }
         public ICollection<IssueForListDto> Issues { get; set; }
+        public ICollection<TaskForListDto> Tasks { get; set; }
     }
 }

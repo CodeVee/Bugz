@@ -51,6 +51,7 @@ namespace Bugz.Server.API.Helpers
                     opt.MapFrom(src => src.User.Id);
                 });
             CreateMap<TaskForCreationDto, Task>();
+            CreateMap<Task, TaskForListDto>();
             CreateMap<Task, TaskForDetailedDto>()
                 .ForMember(dest => dest.Project, opt =>
                 {
