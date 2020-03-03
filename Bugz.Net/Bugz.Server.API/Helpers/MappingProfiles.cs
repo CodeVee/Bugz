@@ -50,6 +50,19 @@ namespace Bugz.Server.API.Helpers
                 {
                     opt.MapFrom(src => src.User.Id);
                 });
+            CreateMap<Task, TaskForDetailedDto>()
+                .ForMember(dest => dest.Project, opt =>
+                {
+                    opt.MapFrom(src => src.Project.Title);
+                })
+                .ForMember(dest => dest.Creator, opt =>
+                {
+                    opt.MapFrom(src => src.Creator.FirstName);
+                })
+                .ForMember(dest => dest.Assignee, opt =>
+                {
+                    opt.MapFrom(src => src.Assignee.FirstName);
+                });
         }
     }
 }
