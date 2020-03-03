@@ -17,12 +17,13 @@ namespace Bugz.Server.API.Helpers
             CreateMap<ProjectForUpdateDto, Project>();
             CreateMap<Project, ProjectForUpdateDto>();
             CreateMap<IssueForCreationDto, Issue>();
+            CreateMap<Issue, IssueForListDto>();
             CreateMap<Issue, IssueForDetailedDto>()
-                .ForMember(dest => dest.Project, opt => 
+                .ForMember(dest => dest.Project, opt =>
                 {
                     opt.MapFrom(src => src.Project.Title);
                 })
-                .ForMember(dest => dest.Reporter, opt => 
+                .ForMember(dest => dest.Reporter, opt =>
                 {
                     opt.MapFrom(src => src.Reporter.FirstName);
                 })
@@ -30,26 +31,25 @@ namespace Bugz.Server.API.Helpers
                 {
                     opt.MapFrom(src => src.Assignee.FirstName);
                 });
+            CreateMap<IssueForUpdateDto, Issue>();
+            CreateMap<Issue, IssueForUpdateDto>();
             CreateMap<UserProject, UserForListDto>()
-                .ForMember(dest => dest.FirstName, opt => 
+                .ForMember(dest => dest.FirstName, opt =>
                 {
                     opt.MapFrom(src => src.User.FirstName);
                 })
-                .ForMember(dest => dest.LastName, opt => 
+                .ForMember(dest => dest.LastName, opt =>
                 {
                     opt.MapFrom(src => src.User.LastName);
                 })
-                .ForMember(dest => dest.Email, opt => 
+                .ForMember(dest => dest.Email, opt =>
                 {
                     opt.MapFrom(src => src.User.Email);
                 })
-                .ForMember(dest => dest.Id, opt => 
+                .ForMember(dest => dest.Id, opt =>
                 {
                     opt.MapFrom(src => src.User.Id);
                 });
-
-            CreateMap<IssueForUpdateDto, Issue>();
-            CreateMap<Issue, IssueForUpdateDto>();
         }
     }
 }

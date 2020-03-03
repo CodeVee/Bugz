@@ -44,7 +44,6 @@ namespace Repository
                         .Include(project => project.Users)
                             .ThenInclude(userproject => userproject.User)
                         .Include(project => project.Issues)
-                            .ThenInclude(issue => issue.Reporter)
                         .Include(project => project.Tasks)
                         .FirstOrDefaultAsync();
         }
