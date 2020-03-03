@@ -43,14 +43,14 @@ namespace Bugz.Server.API.Controllers
             if (projectFromRepo == null)
                 return BadRequest("Project doesn't exist");
 
-            var issuesFromRepo = await _repository.Issue.GetIssue(issueId);
-            if (issuesFromRepo == null)
+            var issueFromRepo = await _repository.Issue.GetIssue(issueId);
+            if (issueFromRepo == null)
                 return BadRequest("Issue doesn't exist");
 
-            if (issuesFromRepo.ProjectId != projectFromRepo.ProjectId)
+            if (issueFromRepo.ProjectId != projectFromRepo.ProjectId)
                 return BadRequest("Issue doesn't exist for current project");
 
-            var issueToReturn = _mapper.Map<IssueForDetailedDto>(issuesFromRepo);
+            var issueToReturn = _mapper.Map<IssueForDetailedDto>(issueFromRepo);
 
             return Ok(issueToReturn);
         }

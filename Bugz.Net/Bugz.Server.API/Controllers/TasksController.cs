@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using Contracts;
 using Entities.DataTransferObjects;
+using Entities.Enumerations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +26,7 @@ namespace Bugz.Server.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetIssuesForProject(Guid projectId)
+        public async Task<IActionResult> GetTasksForProject(Guid projectId)
         {
             var tasksFromRepo = await _repository.Task.GetTasksForProject(projectId);
 
@@ -34,7 +36,7 @@ namespace Bugz.Server.API.Controllers
         }
 
         [HttpGet("{taskId}", Name = "GetTask")]
-        public async Task<IActionResult> GetIssueForProject(Guid projectId, Guid taskId)
+        public async Task<IActionResult> GetTaskForProject(Guid projectId, Guid taskId)
         {
             var projectFromRepo = await _repository.Project.GetProject(projectId);
             if (projectFromRepo == null)
@@ -47,9 +49,49 @@ namespace Bugz.Server.API.Controllers
             if (taskFromRepo.ProjectId != projectFromRepo.ProjectId)
                 return BadRequest("Task doesn't exist for current project");
 
-            var taskToReturn = _mapper.Map<IssueForDetailedDto>(taskFromRepo);
+            var taskToReturn = _mapper.Map<TaskForDetailedDto>(taskFromRepo);
 
             return Ok(taskToReturn);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateTaskForProject(Guid projectId, TaskForCreationDto taskForCreation)
+        {
+            if (taskForCreation.StartDate < DateTime.Today)
+                return BadRequest("Start Date cannot be before today");
+
+            if (taskForCreation.EndDate < taskForCreation.StartDate)
+                return BadRequest("End Date cannot be before Start Date");
+
+            var projectFromRepo = await _repository.Project.GetProject(projectId);
+            if (projectFromRepo == null)
+                return BadRequest("Project doesn't exist");
+
+            Status status;
+            Priority priority;
+            Completion percentage;
+
+            Enum.TryParse(taskForCreation.Status, out status);
+            Enum.TryParse(taskForCreation.Percentage, out percentage);
+            Enum.TryParse(taskForCreation.Priority, out priority);
+
+            var taskToCreate = _mapper.Map<Entities.Models.Task>(taskForCreation);
+            var creatorId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            taskToCreate.Priority = priority;
+            taskToCreate.Percentage = percentage;
+            taskToCreate.Status = status;
+            taskToCreate.ProjectId = projectId;
+            taskToCreate.CreatorId = creatorId;
+
+            _repository.Task.CreateTask(taskToCreate);
+            var saveTask = await _repository.SaveAsync();
+            if (!saveTask)
+                throw new Exception("Failed to create task for project");
+
+            var taskToReturn = _mapper.Map<TaskForDetailedDto>(taskToCreate);
+            return CreatedAtRoute("GetTask",
+            new { projectId = taskToCreate.ProjectId, taskId = taskToCreate.TaskId }, taskToReturn);
         }
     }
 }
