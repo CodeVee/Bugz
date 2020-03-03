@@ -12,5 +12,6 @@ namespace Contracts
         Task<Issue> GetIssue(Guid issueId);
         void CreateIssue(Issue issue);
         void UpdateIssue(Issue issue);
+        void DeleteIssue(Issue issue);
     }
 }

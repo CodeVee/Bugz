@@ -20,6 +20,11 @@ namespace Repository
             Create(issue);
         }
 
+        public void DeleteIssue(Issue issue)
+        {
+            Delete(issue);
+        }
+
         public async Task<IEnumerable<Issue>> GetAllIssues()
         {
             return await FindAll().OrderBy(issue => issue.Created)

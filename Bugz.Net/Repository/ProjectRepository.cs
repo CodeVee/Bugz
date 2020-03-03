@@ -44,6 +44,7 @@ namespace Repository
                         .Include(project => project.Users)
                             .ThenInclude(userproject => userproject.User)
                         .Include(project => project.Issues)
+                            .ThenInclude(issue => issue.Reporter)
                         .Include(project => project.Tasks)
                         .FirstOrDefaultAsync();
         }
@@ -58,7 +59,7 @@ namespace Repository
         public async Task<bool> ProjectTitleIsUnique(string title)
         {
             var project = await FindByCondition(project => project.Title.Equals(title))
-                            .FirstOrDefaultAsync();
+                                .FirstOrDefaultAsync();
             return project.Title.Equals(title);
         }
 

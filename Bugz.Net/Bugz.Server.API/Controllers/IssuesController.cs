@@ -106,7 +106,7 @@ namespace Bugz.Server.API.Controllers
 
             var issueFromRepo = await _repository.Issue.GetIssue(issueId);
             if (issueFromRepo == null)
-                return BadRequest("Project doesn't exist");
+                return BadRequest("Issue doesn't exist");
 
             if (issueForUpdate.AssigneeEmail != null)
             {
@@ -139,6 +139,26 @@ namespace Bugz.Server.API.Controllers
             var updateIssue = await _repository.SaveAsync();
             if (!updateIssue)
                 throw new Exception("Failed to update issue for project");
+
+            return NoContent();
+        }
+
+        [HttpDelete("{issueId}")]
+        public async Task<IActionResult> DeleteProject(Guid projectId, Guid issueId)
+        {
+            var projectFromRepo = await _repository.Project.GetProject(projectId);
+            if (projectFromRepo == null)
+                return BadRequest("Project doesn't exist");
+
+            var issueFromRepo = await _repository.Issue.GetIssue(issueId);
+            if (issueFromRepo == null)
+                return BadRequest("Issue doesn't exist");
+
+            _repository.Issue.DeleteIssue(issueFromRepo);
+
+            var deleteIssue = await _repository.SaveAsync();
+            if (!deleteIssue)
+                throw new Exception("Failed to Delete Issue");
 
             return NoContent();
         }
