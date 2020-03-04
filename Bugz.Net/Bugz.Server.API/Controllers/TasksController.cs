@@ -7,6 +7,7 @@ using AutoMapper;
 using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Enumerations;
+using Entities.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -163,6 +164,52 @@ namespace Bugz.Server.API.Controllers
             var deleteTask = await _repository.SaveAsync();
             if (!deleteTask)
                 throw new Exception("Failed to Delete Task");
+
+            return NoContent();
+        }
+
+        [HttpGet("{taskId}/comments", Name = "GetTaskComments")]
+        public async Task<IActionResult> GetCommentsForTask(Guid projectId, Guid taskId)
+        {
+            var projectFromRepo = await _repository.Project.GetProject(projectId);
+            if (projectFromRepo == null)
+                return BadRequest("Project doesn't exist");
+
+            var taskFromRepo = await _repository.Task.GetTask(taskId);
+            if (taskFromRepo == null)
+                return BadRequest("Task doesn't exist");
+
+            var comments = await _repository.Comment.GetCommentsForTask(taskId);
+            var commentsToReturn = _mapper.Map<IEnumerable<CommentForListDto>>(comments);
+
+            return Ok(commentsToReturn);
+        }
+
+        [HttpPost("{taskId}/comments")]
+        public async Task<IActionResult> CreateCommentForTask(Guid projectId, Guid taskId, CommentForCreationDto commentForCreation)
+        {
+            var projectFromRepo = await _repository.Project.GetProjectWithUsers(projectId);
+            if (projectFromRepo == null)
+                return BadRequest("Project doesn't exist");
+
+            var taskFromRepo = await _repository.Task.GetTask(taskId);
+            if (taskFromRepo == null)
+                return BadRequest("Task doesn't exist");
+
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userOnProject = projectFromRepo.Users.FirstOrDefault(up => up.UserId.Equals(userId));
+            if (userOnProject == null)
+                return BadRequest("User not on project");
+
+            var commentToCreate = _mapper.Map<Comment>(commentForCreation);
+            commentToCreate.Posted = DateTime.Now;
+            commentToCreate.UserId = userId;
+            commentToCreate.TaskId = taskId;
+
+            _repository.Comment.CreateComment(commentToCreate);
+            var saveComment = await _repository.SaveAsync();
+            if (!saveComment)
+                throw new Exception("Failed to Create Comment");
 
             return NoContent();
         }
