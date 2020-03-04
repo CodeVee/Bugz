@@ -67,6 +67,12 @@ namespace Bugz.Server.API.Helpers
                 });
             CreateMap<TaskForUpdateDto, Task>();
             CreateMap<Task, TaskForUpdateDto>();
+            CreateMap<Comment, CommentForListDto>()
+                .ForMember(dest => dest.CommentBy, opt => 
+                {
+                    opt.MapFrom(src => src.User.FirstName);
+                });
+            CreateMap<CommentForCreationDto, Comment>();
         }
     }
 }
