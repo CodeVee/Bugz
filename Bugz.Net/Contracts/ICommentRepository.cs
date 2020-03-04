@@ -8,6 +8,7 @@ namespace Contracts
     public interface ICommentRepository : IRepositoryBase<Comment>
     {
         Task<IEnumerable<Comment>> GetCommentsForTask(Guid taskId);
+        Task<IEnumerable<Comment>> GetCommentsForIssue(Guid issueId);
         void CreateComment(Comment comment);
     }
 }

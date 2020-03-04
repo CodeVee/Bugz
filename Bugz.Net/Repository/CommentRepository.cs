@@ -20,6 +20,14 @@ namespace Repository
             Create(comment);
         }
 
+        public async Task<IEnumerable<Comment>> GetCommentsForIssue(Guid issueId)
+        {
+            return await FindByCondition(comment => comment.IssueId.Equals(issueId))
+                        .Include(comment => comment.User)
+                        .OrderByDescending(comment => comment.Posted)
+                        .ToListAsync();
+        }
+
         public async Task<IEnumerable<Comment>> GetCommentsForTask(Guid taskId)
         {
             return await FindByCondition(comment => comment.TaskId.Equals(taskId))
