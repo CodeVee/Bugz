@@ -12,5 +12,6 @@ namespace Entities.Models
         public Task Task { get; set; }
         public Guid? IssueId { get; set; }
         public Issue Issue { get; set; }
+        public DateTime Posted { get; set; }
     }
 }
