@@ -179,5 +179,34 @@ namespace Bugz.Server.API.Controllers
 
             return Ok(commentsToReturn);
         }
+
+        [HttpPost("{issueId}/comments")]
+        public async Task<IActionResult> CreateCommentForTask(Guid projectId, Guid issueId, CommentForCreationDto commentForCreation)
+        {
+            var projectFromRepo = await _repository.Project.GetProjectWithUsers(projectId);
+            if (projectFromRepo == null)
+                return BadRequest("Project doesn't exist");
+
+            var issueFromRepo = await _repository.Issue.GetIssue(issueId);
+            if (issueFromRepo == null)
+                return BadRequest("Issue doesn't exist");
+
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userOnProject = projectFromRepo.Users.FirstOrDefault(up => up.UserId.Equals(userId));
+            if (userOnProject == null)
+                return BadRequest("User not on project");
+
+            var commentToCreate = _mapper.Map<Comment>(commentForCreation);
+            commentToCreate.Posted = DateTime.Now;
+            commentToCreate.UserId = userId;
+            commentToCreate.IssueId = issueId;
+
+            _repository.Comment.CreateComment(commentToCreate);
+            var saveComment = await _repository.SaveAsync();
+            if (!saveComment)
+                throw new Exception("Failed to Create Comment");
+
+            return NoContent();
+        }
     }
 }
