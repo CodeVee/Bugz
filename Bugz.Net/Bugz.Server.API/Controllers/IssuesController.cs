@@ -162,5 +162,22 @@ namespace Bugz.Server.API.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("{issueId}/comments")]
+        public async Task<IActionResult> GetCommentsForTask(Guid projectId, Guid issueId)
+        {
+            var projectFromRepo = await _repository.Project.GetProject(projectId);
+            if (projectFromRepo == null)
+                return BadRequest("Project doesn't exist");
+
+            var issueFromRepo = await _repository.Issue.GetIssue(issueId);
+            if (issueFromRepo == null)
+                return BadRequest("Issue doesn't exist");
+
+            var comments = await _repository.Comment.GetCommentsForIssue(issueId);
+            var commentsToReturn = _mapper.Map<IEnumerable<CommentForListDto>>(comments);
+
+            return Ok(commentsToReturn);
+        }
     }
 }

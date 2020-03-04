@@ -168,7 +168,7 @@ namespace Bugz.Server.API.Controllers
             return NoContent();
         }
 
-        [HttpGet("{taskId}/comments", Name = "GetTaskComments")]
+        [HttpGet("{taskId}/comments")]
         public async Task<IActionResult> GetCommentsForTask(Guid projectId, Guid taskId)
         {
             var projectFromRepo = await _repository.Project.GetProject(projectId);
